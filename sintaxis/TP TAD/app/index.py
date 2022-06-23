@@ -31,21 +31,18 @@ def menu():
   print('\n2. Modificar prioridad de proceso')
   print('\n3. Desencolar proceso')
   print('\n4. Listar todos procesos')
-  print('\n5. Listar un proceso')
-  print('\n6. Cambiar a prioridad baja todos los procesos dado un mes')
-  print('\n7. Eliminar todos los procesos de un tipo particular')
-  print('\n8. Generar nueva cola a partir de intervalo horario')
+  print('\n5. Cambiar a prioridad baja todos los procesos dado un mes')
+  print('\n6. Eliminar todos los procesos de un tipo particular')
+  print('\n7. Generar nueva cola a partir de intervalo horario')
+  #print('\n8. Listar un proceso')
 
   print('\n',format(' Presione 0 para finalizar ', '*^40'))
 
   #Modificar porque si ingreso número decimal se rompe
   #option = int(input('Opcion: '))
-  optionInput = input('\nOpcion: ')
+  option = input('\nOpcion: ')
 
-  try:
-    option = int(optionInput)
-  except ValueError:
-    option = -1
+  option = verifyInt(option)
 
   return option
 
@@ -64,55 +61,66 @@ while option != 0:
     if option == 1:
       process = createProcess()
       name = input('\nIngresar nombre: ')
-      processType = input('Ingresar tipo: ')
-      size = input('Ingresar tamaño: ')
-      priority = input('Ingresar prioridad: ')
+      print('\nTipo')
+      print('1. KERNEL')
+      print('2. USUARIO')
+      processType = input('\nIngresar: ')
+      size = input('\nIngresar tamaño: ')
+      print('\nPrioridad')
+      print('1. LOW')
+      print('2. MID')
+      print('3. HIGH')
+      priority = input('Ingresar: ')
+      date = input('\nFecha (YYYY-MM-DD): ')
+      hour = input('\nHora (hh:mm): ')
 
-      response = addProcess(queue, process, name, processType, size, priority)
+      response = addProcess(queue, process, name, processType, size, priority, date, hour)
+      
+      if response:
+        print('\n', response)
 
-      print('\n',response)
       sleep(0.5)
+
     elif option == 2:
-      index = int(input('\nIngresar indice de proceso: '))
-      search = searchProcess(queue, index)
-      if search:
-        print('\n1. LOW')
-        print('2. MID')
-        print('3. HIGH')
-        inputPriority = input('\nSeleccionar prioridad: ')
+      id = input('\nIngresar ID de proceso: ')
+      print('\n1. LOW')
+      print('2. MID')
+      print('3. HIGH')
+      priority = input('\nSeleccionar prioridad: ')
+      response = modPriority(queue, id, priority)
 
-        try:
-          priority = int(inputPriority)
-        except ValueError:
-          priority = -1
+      if response:
+        print('\n', response)
 
-        response = modPriority(queue, index, priority)
+    elif option == 3:
+      id = input('\nIngresar ID de proceso: ')
+      response = delProcess(queue, id)
 
-        print(response)
-      else:
-        print('\nEl proceso no existe')
-
-    elif option == 12:
-      index = int(input('Ingresar indice de proceso: '))
-      search = searchProcess(queue, index)
-      if search:
-        name = input('Ingresar nombre: ')
-        processType = input('Ingresar tipo: ')
-        size = input('Ingresar tamaño: ')
-        priority = input('Ingresar prioridad: ')
-
-        response = modProcess(queue, index, name, processType, size, priority)
-
-        print(response)
-      else:
-        print('\nEl proceso no existe')
+      print(response)
+      
     elif option == 4:
-      listAllProcess(queue)
+      response = listAllProcess(queue)
+
+      if response:
+        print('\n', response)
+
       input('\n\nPresionar enter para mostrar menú')
+
+    elif option == 5:
+      month = input('\nIngresar mes (MM): ')
+      lowPriorityByMonth(queue, month)
+
+    elif option == 6:
+      print('\nTipo')
+      print('1. KERNEL')
+      print('2. USUARIO')
+      processType = input('\nIngresar: ')
+      response = delByType(queue, processType)
+
+      print('\n', response)
 
     option = menu()
 
-
-
-
 print('\nPrograma terminado')
+
+
