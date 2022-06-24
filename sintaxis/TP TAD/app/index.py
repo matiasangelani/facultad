@@ -9,17 +9,6 @@ f) Eliminar los procesos cuyo tipo sea igual al ingresado
 g) Generar una cola con aquellos procesos cuya última modificación se encuentre entre dos horas dadas
 '''
 
-'''
-Lista de TADs
-
-  tadProceso
-    Voy a querer un CRUD de procesos (mostrar individual y toda la cola)
-
-'''
-
-#Importo TAD
-#import tads.tadProcesos
-
 from os import system
 from time import sleep
 from tads.processesTAD import *
@@ -30,17 +19,15 @@ def menu():
   print('\n1. Encolar proceso')
   print('\n2. Modificar prioridad de proceso')
   print('\n3. Desencolar proceso')
-  print('\n4. Listar todos procesos')
+  print('\n4. Listar procesos')
   print('\n5. Cambiar a prioridad baja todos los procesos dado un mes')
   print('\n6. Eliminar todos los procesos de un tipo particular')
   print('\n7. Generar nueva cola a partir de intervalo horario')
-  #print('\n8. Listar un proceso')
 
   print('\n',format(' Presione 0 para finalizar ', '*^40'))
 
   option = input('\nOpcion: ')
 
-  #option = verifyInt(option)
   try:
     option = int(option)
   except ValueError:
@@ -82,12 +69,15 @@ while option != 0:
         print('\n', response)
 
     elif option == 2:
-      id = input('\nIngresar ID de proceso: ')
+      print('\nMétodo de búsqueda')
+      print('1. ID')
+      print('2. Nombre')
+      search = input('Seleccionar método: ')
       print('\n1. LOW')
       print('2. MID')
       print('3. HIGH')
       priority = input('\nSeleccionar prioridad: ')
-      response = modPriority(queue, id, priority)
+      response = modPriority(queue, search, priority)
 
       if response:
         print('\n', response)
@@ -99,7 +89,16 @@ while option != 0:
       print(response)
 
     elif option == 4:
-      response = listAllProcess(queue)
+      print('\nOpciones de listado')
+      print('1. Listar todo')
+      print('2. Listar de tipo Kernel')
+      print('3. Listar de tipo Usuario')
+      print('4. Prioridad LOW')
+      print('5. Prioridad MID')
+      print('6. Prioridad HIGH')
+      search = input('Seleccionar opción: ')
+      
+      response = listProcess(queue, search)
 
       if response:
         print('\n', response)

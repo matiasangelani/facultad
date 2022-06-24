@@ -1,7 +1,5 @@
-#import os
 import uuid
 from datetime import datetime
-#import time
 from tads.validationsTAD import *
 
 
@@ -20,18 +18,13 @@ def createProcess():
 def addProcess(queue, process, name, processType, size, priority, date, hour):
   #Agrega proceso a la cola
   size = verifyInt(size)
-  # priority = verifyInt(priority)
-  #date = verifyInt(date)
   date = isValidDate(date)
   hour = isValidHour(hour)
 
   if size == -1 or not date or not hour:
     return False
   
-  # file = open("db.txt", "a")
-
   process[0] = str(uuid.uuid4())
-  # file.write(process[0])
   process[1] = name
   process[3] = size
   process[5] = date
@@ -55,28 +48,50 @@ def addProcess(queue, process, name, processType, size, priority, date, hour):
     print('\nOpción incorrecta, vuelva a intentarlo')
     return 'Value error'
 
-  # process[5] = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-
   queue.append(process)
-
-  # file.close()
 
   return 'Process added'
 
 
-def listAllProcess(queue):
+def listProcess(queue, search = 1):
   #Lista todos los procesos
+  count = 0
   if not len(queue):
     return '\n\nLista vacía'
 
-  print ('\n\t{:^40} {:<10} {:<10} {:<10} {:<10} {:<15} {:<10}'.format('ID','NOMBRE','TIPO', 'TAMAÑO', 'PRIORIDAD', 'FECHA', 'HORA'))
+  search = verifyInt(search)
+
+  if search == -1:
+    return False
+
+  print('\n\t{:^40} {:<10} {:<10} {:<10} {:<10} {:<15} {:<10}'.format('ID','NOMBRE','TIPO', 'TAMAÑO', 'PRIORIDAD', 'FECHA', 'HORA'))
+  
+  position = 0
+  value = ''
+  if search == 2:
+    position = 2
+    value = 'KERNEL'
+  elif search == 3:
+    position = 2
+    value = 'USER'
+  elif search == 4:
+    position = 4
+    value = 'LOW'
+  elif search == 5:
+    position = 4
+    value = 'MID'
+  elif search == 6:
+    position = 4
+    value = 'HIGH'
 
   for process in queue:
     id, name, processType, size, priority, date, hour = process
-    print('\n\t{:^40} {:<10} {:<10} {:<10} {:<10} {:<15} {:<10}'.format(id, name, processType, size, priority, date, hour))
+    if search == 1 or process[position] == value:
+      count = 1
+      print('\n\t{:^40} {:<10} {:<10} {:<10} {:<10} {:<15} {:<10}'.format(id, name, processType, size, priority, date, hour))
 
-  # file = open("db.txt", "r")
-  # print(file.read())
+  if not count:
+    print('\n\nDatos existe datos, use otro filtro')
   
 
 def modProcess(queue, index, name, processType, size, priority):
@@ -103,15 +118,17 @@ def delProcess(queue, id):
   return '\nProcess not found'
 
 
-def modPriority(queue, id, priority):
+def modPriority(queue, search, priority):
   #Modifica prioridad de un proceso
-  # index = verifyInt(index)
-  # priority = verifyInt(priority)
+  name = ''
+  id = ''
+  
+  if search == '1':
+    id = input('\nIngresar ID: ')
+  elif search == '2':
+    name = input('\nIngresar nombre: ')
 
-  # if index == -1 or priority == -1:
-  #   return False
-
-  process = searchProcess(queue, id)
+  process = searchProcess(queue, id, name)
 
   if process:
     if priority == '1':
@@ -133,12 +150,10 @@ def modPriority(queue, id, priority):
   return '\nProcess not found'
 
 
-def searchProcess(queue, id):
+def searchProcess(queue, id, name):
   #Busca un proceso
-  #index = verifyInt(index)
-  #if index != -1:
   for process in queue:
-    if id == process[0]:
+    if id == process[0] or name == process[1]:
       return process
 
   return False
@@ -196,8 +211,6 @@ def newQueueByHour(queue, hour, secondHour):
   hour = hour.split(':')
   secondHour = secondHour.split(':')
 
-  #if int(hour[0]) - int(secondHour[0]) < 0:
-    #return '\nPor favor, ingresar horario en orden inverso'
   if (int(secondHour[0]) - int(hour[0]) < 0) or (int(hour[0]) - int(secondHour[0]) == 0 and int(hour[1]) > int(secondHour[1])):
     return '\nPor favor, ingresar horario en orden inverso'
 
@@ -211,7 +224,7 @@ def newQueueByHour(queue, hour, secondHour):
     elif processHour == int(secondHour[0]) and processMinute >= int(hour[1]) and processMinute <= int(secondHour[1]):
       newQueue.append(process)
       
-  response = listAllProcess(newQueue)
+  response = listProcess(newQueue)
 
   if response:
     return response
