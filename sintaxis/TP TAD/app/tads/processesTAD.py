@@ -1,17 +1,21 @@
-import os
+#import os
 import uuid
 from datetime import datetime
-import time
+#import time
+from tads.validationsTAD import *
+
 
 def createQueue():
   #Crea una cola
   queue = []
   return queue
 
+
 def createProcess():
   #Crea un proceso
-  process = ["","","","","","",""]
+  process = ["", "", "", 0, "", "", ""]
   return process
+
 
 def addProcess(queue, process, name, processType, size, priority, date, hour):
   #Agrega proceso a la cola
@@ -59,8 +63,9 @@ def addProcess(queue, process, name, processType, size, priority, date, hour):
 
   return 'Process added'
 
-def listAllProcess(queue):
 
+def listAllProcess(queue):
+  #Lista todos los procesos
   if not len(queue):
     return '\n\nLista vacía'
 
@@ -85,16 +90,18 @@ def modProcess(queue, index, name, processType, size, priority):
       process[5] = datetime.today().strftime('%Y-%m-%d')
       process[6] = datetime.today().strftime('%H:%M')
 
-  return 'Process modified'
+  return '\nProcess modified'
+
 
 def delProcess(queue, id):
   #Elimina proceso por ID
   for i, process in enumerate(queue):
     if id == process[0]:
       queue.pop(i)
-      return 'Process deleted'
+      return '\nProcess deleted'
 
-  return 'Process not found'
+  return '\nProcess not found'
+
 
 def modPriority(queue, id, priority):
   #Modifica prioridad de un proceso
@@ -121,11 +128,13 @@ def modPriority(queue, id, priority):
     process[5] = datetime.today().strftime('%Y-%m-%d')
     process[6] = datetime.today().strftime('%H:%M')
 
-    return 'Priority modified'
+    return '\nPriority modified'
   
-  return 'Process not found'
+  return '\nProcess not found'
+
 
 def searchProcess(queue, id):
+  #Busca un proceso
   #index = verifyInt(index)
   #if index != -1:
   for process in queue:
@@ -134,8 +143,10 @@ def searchProcess(queue, id):
 
   return False
 
-def lowPriorityByMonth(queue, month):
 
+def lowPriorityByMonth(queue, month):
+  #La prioridad de todos los procesos que pertenezcan al mes ingresado cambiará a LOW
+  count = 0
   month = isValidMonth(month)
 
   if not month:
@@ -143,14 +154,19 @@ def lowPriorityByMonth(queue, month):
 
   for process in queue:
     if process[5][5:7] == month:
+      count = 1
       process[4] = 'LOW'
       process[5] = datetime.today().strftime('%Y-%m-%d')
       process[6] = datetime.today().strftime('%H:%M')
 
-  return True
+  if count:
+    return '\nPrioridad de procesos del mes {month} modificados a LOW'.format(month = month)
+
+  return '\nNingún proceso encontrado con mes {month}'.format(month = month)
+
 
 def delByType(queue, processType):
-
+  #Elimina todos los procesos que pertenezcan al tipo ingresado
   if processType == '1':
     processType = 'KERNEL'
   elif processType == '2':
@@ -159,43 +175,45 @@ def delByType(queue, processType):
     print('\nOpción incorrecta, vuelva a intentarlo')
     return 'Value error'
 
-  # Tengo que recorrer la cola al revés
-  for process in queue:
+  for process in reversed(queue):
     if process[2] == processType:
       queue.remove(process)
 
-  return 'Todos los procesos tipo {processType} han sido eliminados'.format(processType = processType)
+  return '\nTodos los procesos tipo {processType} han sido eliminados'.format(processType = processType)
 
-def verifyInt(value):
-  try:
-    value = int(value)
-    return value
-  except ValueError:
-    print('\nDato ingresado incorrecto')
-    return -1
 
-def isValidDate(date):
-  try:
-    datetime.strptime(date, '%Y-%m-%d')
-    #return date.strftime('%Y-%m-%d')
-    return date
-  except ValueError:
-    print('\nFormato de fecha incorrecto, vuelva a intentarlo') 
+def newQueueByHour(queue, hour, secondHour):
+  #Genera y muestra una nueva cola a partir de un intervalo horario ingresado
+  newQueue = []
+  hour = isValidHour(hour)
+  secondHour = isValidHour(secondHour)
+
+  if not hour or not secondHour:
     return False
 
-def isValidHour(hour):
-  try:
-    time.strptime(hour, '%H:%M')
-    #return hour.strftime('%H:%M')
-    return hour
-  except ValueError:
-    print('\nFormato de hora incorrecto, vuelva a intentarlo') 
-    return False
+  oldHour = hour
+  oldSecondHour = secondHour
+  hour = hour.split(':')
+  secondHour = secondHour.split(':')
 
-def isValidMonth(month):
-  try:
-    time.strptime(month, '%m')
-    return month
-  except ValueError:
-    print('\nFormato de mes incorrecto, vuelva a intentarlo') 
-    return False
+  #if int(hour[0]) - int(secondHour[0]) < 0:
+    #return '\nPor favor, ingresar horario en orden inverso'
+  if (int(secondHour[0]) - int(hour[0]) < 0) or (int(hour[0]) - int(secondHour[0]) == 0 and int(hour[1]) > int(secondHour[1])):
+    return '\nPor favor, ingresar horario en orden inverso'
+
+  for process in queue:
+    processHour = int(process[6].split(':')[0])
+    processMinute = int(process[6].split(':')[1])
+    if processHour > int(hour[0]) and processHour < int(secondHour[0]):
+      newQueue.append(process)
+    elif processHour == int(hour[0]) and processMinute >= int(hour[1]) and processMinute <= int(secondHour[1]):
+      newQueue.append(process)
+    elif processHour == int(secondHour[0]) and processMinute >= int(hour[1]) and processMinute <= int(secondHour[1]):
+      newQueue.append(process)
+      
+  response = listAllProcess(newQueue)
+
+  if response:
+    return response
+
+  return '\nNueva cola en intervalo {oldHour} - {oldSecondHour} creada'.format(oldHour = oldHour, oldSecondHour = oldSecondHour)

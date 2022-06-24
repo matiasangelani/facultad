@@ -38,11 +38,14 @@ def menu():
 
   print('\n',format(' Presione 0 para finalizar ', '*^40'))
 
-  #Modificar porque si ingreso número decimal se rompe
-  #option = int(input('Opcion: '))
   option = input('\nOpcion: ')
 
-  option = verifyInt(option)
+  #option = verifyInt(option)
+  try:
+    option = int(option)
+  except ValueError:
+    print('\nDato ingresado incorrecto')
+    option = -1
 
   return option
 
@@ -51,11 +54,10 @@ queue = createQueue()
 option = menu()
 
 while option != 0:
-  if option < 1 or option > 8:
+  if option < 1 or option > 7:
     print('\n\nLa opcion ingresada es incorrecta, vuelva a intentarlo')
-    print('\n\n------------------------------------------------------')
-    print('\n\nCLEARING...')
-    sleep(1.5)
+    input('\n\nPresione enter para continuar')
+
     option = menu()
   else:
     if option == 1:
@@ -79,8 +81,6 @@ while option != 0:
       if response:
         print('\n', response)
 
-      sleep(0.5)
-
     elif option == 2:
       id = input('\nIngresar ID de proceso: ')
       print('\n1. LOW')
@@ -97,18 +97,19 @@ while option != 0:
       response = delProcess(queue, id)
 
       print(response)
-      
+
     elif option == 4:
       response = listAllProcess(queue)
 
       if response:
         print('\n', response)
 
-      input('\n\nPresionar enter para mostrar menú')
-
     elif option == 5:
       month = input('\nIngresar mes (MM): ')
-      lowPriorityByMonth(queue, month)
+      response = lowPriorityByMonth(queue, month)
+
+      if response:
+        print('\n', response)
 
     elif option == 6:
       print('\nTipo')
@@ -119,8 +120,16 @@ while option != 0:
 
       print('\n', response)
 
+    elif option == 7:
+      hour = input('\nIngresar primer hora (hh:mm): ')
+      secondHour = input('\nIngresar segunda hora (hh:mm): ')
+
+      response = newQueueByHour(queue, hour, secondHour)
+
+      if response:
+        print('\n', response)
+
+    input('\n\nPresione enter para continuar')
     option = menu()
 
 print('\nPrograma terminado')
-
-
