@@ -10,8 +10,8 @@ g) Generar una cola con aquellos procesos cuya última modificación se encuentr
 '''
 
 from os import system
-from time import sleep
 from tads.processesTAD import *
+from tads.queueTAD import *
 
 def menu():
   system('clear')
@@ -63,9 +63,10 @@ while option != 0:
       date = input('\nFecha (YYYY-MM-DD): ')
       hour = input('\nHora (hh:mm): ')
 
-      response = addProcess(queue, process, name, processType, size, priority, date, hour)
+      response = addProcess(process, name, processType, size, priority, date, hour)
       
       if response:
+        uploadQueue(queue, process)
         print('\n', response)
 
     elif option == 2:
@@ -84,24 +85,21 @@ while option != 0:
 
     elif option == 3:
       id = input('\nIngresar ID de proceso: ')
-      response = delProcess(queue, id)
+      response = deleteProcess(queue, id)
 
       print(response)
 
     elif option == 4:
-      print('\nOpciones de listado')
-      print('1. Listar todo')
-      print('2. Listar de tipo Kernel')
-      print('3. Listar de tipo Usuario')
-      print('4. Prioridad LOW')
-      print('5. Prioridad MID')
-      print('6. Prioridad HIGH')
-      search = input('Seleccionar opción: ')
-      
-      response = listProcess(queue, search)
+      cont = 0
+      for i in range(0, queueSize(queue)):
+        cont = 1
+        process = readQueue(queue, i)
+        if i == 0:
+          print('\n\t{:^40} {:<10} {:<10} {:<10} {:<10} {:<15} {:<10}'.format('ID','NOMBRE','TIPO', 'TAMAÑO', 'PRIORIDAD', 'FECHA', 'HORA'))
+        print('\n\t{:^40} {:<10} {:<10} {:<10} {:<10} {:<15} {:<10}'.format(readId(process), readName(process), readProcessType(process), readSize(process), readPriority(process), readDate(process), readHour(process)))
 
-      if response:
-        print('\n', response)
+      if not cont:
+        print('\n\nLa cola está vacía')
 
     elif option == 5:
       month = input('\nIngresar mes (MM): ')
@@ -123,10 +121,21 @@ while option != 0:
       hour = input('\nIngresar primer hora (hh:mm): ')
       secondHour = input('\nIngresar segunda hora (hh:mm): ')
 
-      response = newQueueByHour(queue, hour, secondHour)
+      newQueue = newQueueByHour(queue, hour, secondHour)
+      
+      cont = 0
+      for i in range(0, queueSize(newQueue)):
+        cont = 1
+        if isinstance(newQueue, str):
+          print(newQueue)
+          break
+        process = readQueue(newQueue, i)
+        if i == 0:
+          print('\n\t{:^40} {:<10} {:<10} {:<10} {:<10} {:<15} {:<10}'.format('ID','NOMBRE','TIPO', 'TAMAÑO', 'PRIORIDAD', 'FECHA', 'HORA'))
+        print('\n\t{:^40} {:<10} {:<10} {:<10} {:<10} {:<15} {:<10}'.format(readId(process), readName(process), readProcessType(process), readSize(process), readPriority(process), readDate(process), readHour(process)))
 
-      if response:
-        print('\n', response)
+      if not cont:
+        print('\n\nLa cola está vacía')
 
     input('\n\nPresione enter para continuar')
     option = menu()
